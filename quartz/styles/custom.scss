@@ -4,8 +4,31 @@
 // put your custom CSS here!
 
 .excalidraw-svg {
-  max-width: 700px;
-  height: auto;
+  max-width: 100%;
+  width: 100%;
+  min-height: 200px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  aspect-ratio: 16 / 9; // Default aspect ratio, adjust per drawing if needed
+
+  // Hide light version in dark mode and vice versa
+  &.excalidraw-dark {
+    display: block;
+  }
+  &.excalidraw-light {
+    display: none;
+  }
+}
+
+// Light mode: show light, hide dark
+:root[saved-theme="light"] {
+  .excalidraw-svg.excalidraw-dark {
+    display: none;
+  }
+  .excalidraw-svg.excalidraw-light {
+    display: block;
+  }
 }
 
 footer {
