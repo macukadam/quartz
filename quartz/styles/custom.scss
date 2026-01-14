@@ -3,16 +3,16 @@
 
 // put your custom CSS here!
 
-.excalidraw-svg {
-  max-width: 100%;
+// Excalidraw images - converted from div background-image to proper <img> tags
+.excalidraw-img {
+  display: block;
   width: 100%;
-  min-height: 200px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  aspect-ratio: 16 / 9; // Default aspect ratio, adjust per drawing if needed
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+  border-radius: 8px;
 
-  // Hide light version in dark mode and vice versa
+  // Dark mode (default): show dark, hide light
   &.excalidraw-dark {
     display: block;
   }
@@ -22,6 +22,25 @@
 }
 
 // Light mode: show light, hide dark
+:root[saved-theme="light"] {
+  .excalidraw-img.excalidraw-dark {
+    display: none;
+  }
+  .excalidraw-img.excalidraw-light {
+    display: block;
+  }
+}
+
+// Legacy fallback for any remaining div-based excalidraw (if any)
+.excalidraw-svg {
+  &.excalidraw-dark {
+    display: block;
+  }
+  &.excalidraw-light {
+    display: none;
+  }
+}
+
 :root[saved-theme="light"] {
   .excalidraw-svg.excalidraw-dark {
     display: none;
