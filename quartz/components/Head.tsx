@@ -98,7 +98,11 @@ export default (() => {
           }
         })}
         <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
-        <script src={joinSegments(baseDir, "static/scripts/pyodide-runner.js")} defer></script>
+        <script
+          src={joinSegments(baseDir, "static/scripts/pyodide-runner.js")}
+          data-manifest={joinSegments(baseDir, "static/python/manifest.json")}
+          defer
+        ></script>
       </head>
     )
   }
