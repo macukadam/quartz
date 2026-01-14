@@ -24,16 +24,12 @@ const attachPyodideButtons = () => {
     }
 
     block.dataset.pyodideAttached = "true"
-    console.log("Found Python code block")
-    console.log("Code content:", code.textContent)
 
     const btn = document.createElement("button")
-    console.log("Creating run button")
     btn.textContent = "▶ Run"
     btn.className = "pyodide-run-btn"
 
     const output = document.createElement("pre")
-    console.log("Creating output area")
     output.className = "pyodide-output"
     output.style.display = "none"
 
@@ -43,7 +39,6 @@ const attachPyodideButtons = () => {
 
       try {
         const py = await initPyodide()
-        console.log("Pyodide initialized")
 
         // Capture stdout
         py.runPython(`

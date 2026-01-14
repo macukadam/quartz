@@ -7,3 +7,49 @@
   max-width: 700px;
   height: auto;
 }
+
+footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--lightgray);
+  opacity: 0.9;
+
+  ul {
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+}
+
+.pyodide-run-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--lightgray);
+  background: var(--highlight);
+  color: var(--secondary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+
+  &:hover {
+    background: var(--secondary);
+    color: var(--light);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+}
+
+.pyodide-output {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: var(--lightgray);
+  border-radius: 6px;
+  border: 1px dashed var(--lightgray);
+}
