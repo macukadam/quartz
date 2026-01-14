@@ -14,10 +14,14 @@ async function initPyodide() {
   if (!modulesLoaded) {
     const baseHref = document.querySelector("base")?.href || "/"
     const baseUrl = new URL(baseHref, window.location.origin)
+    const scriptSrc = document.currentScript?.getAttribute("src")
+    const staticBase = scriptSrc
+      ? new URL("../..", new URL(scriptSrc, window.location.origin))
+      : new URL("static/", baseUrl)
 
     try {
       // Fetch the auto-generated manifest
-      const manifestUrl = new URL("static/python/manifest.json", baseUrl).href
+      const manifestUrl = new URL("python/manifest.json", staticBase).href
       const manifestResponse = await fetch(manifestUrl)
       if (!manifestResponse.ok) {
         console.warn("Python manifest not found. Run the build to generate it.")
@@ -56,7 +60,7 @@ async function initPyodide() {
             }
           }
 
-          const moduleUrl = new URL(`static/python/${modulePath}`, baseUrl).href
+          const moduleUrl = new URL(`python/${modulePath}`, staticBase).href
           const response = await fetch(moduleUrl)
           if (response.ok) {
             const moduleCode = await response.text()
