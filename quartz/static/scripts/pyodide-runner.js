@@ -12,39 +12,14 @@ async function initPyodide() {
 
   // Load shared modules if not already loaded
   if (!modulesLoaded) {
-    const baseHref = document.querySelector("base")?.href || "/"
-    const baseUrl = new URL(baseHref, window.location.origin)
-    const scriptTag =
-      document.currentScript || document.querySelector("script[src*='pyodide-runner.js']")
-    const scriptSrc = scriptTag?.getAttribute("src")
-    const manifestAttr = scriptTag?.getAttribute("data-manifest")
-    const staticBase = scriptSrc
-      ? new URL("../..", new URL(scriptSrc, window.location.origin))
-      : new URL("static/", baseUrl)
+    // Use the injected static base path from Quartz (absolute URL)
+    const staticPythonBase = window.__PYODIDE_STATIC_BASE__ || "/static/python/"
 
     try {
       // Fetch the auto-generated manifest
-      const manifestCandidates = [
-        ...(manifestAttr ? [new URL(manifestAttr, baseUrl).href] : []),
-        new URL("python/manifest.json", staticBase).href,
-        new URL("static/python/manifest.json", baseUrl).href,
-        new URL("/static/python/manifest.json", window.location.origin).href,
-      ]
-
-      let manifestResponse = null
-      for (const candidate of manifestCandidates) {
-        try {
-          const response = await fetch(candidate)
-          if (response.ok) {
-            manifestResponse = response
-            break
-          }
-        } catch (e) {
-          // ignore and try next candidate
-        }
-      }
-
-      if (!manifestResponse) {
+      const manifestUrl = staticPythonBase + "manifest.json"
+      const manifestResponse = await fetch(manifestUrl)
+      if (!manifestResponse.ok) {
         console.warn("Python manifest not found. Run the build to generate it.")
         modulesLoaded = true
         return pyodide
@@ -81,7 +56,7 @@ async function initPyodide() {
             }
           }
 
-          const moduleUrl = new URL(`python/${modulePath}`, staticBase).href
+          const moduleUrl = staticPythonBase + modulePath
           const response = await fetch(moduleUrl)
           if (response.ok) {
             const moduleCode = await response.text()
