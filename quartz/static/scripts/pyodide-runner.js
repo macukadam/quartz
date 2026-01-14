@@ -14,7 +14,8 @@ async function initPyodide() {
   if (!modulesLoaded) {
     const baseHref = document.querySelector("base")?.href || "/"
     const baseUrl = new URL(baseHref, window.location.origin)
-    const scriptTag = document.currentScript
+    const scriptTag =
+      document.currentScript || document.querySelector("script[src*='pyodide-runner.js']")
     const scriptSrc = scriptTag?.getAttribute("src")
     const manifestAttr = scriptTag?.getAttribute("data-manifest")
     const staticBase = scriptSrc
@@ -24,7 +25,7 @@ async function initPyodide() {
     try {
       // Fetch the auto-generated manifest
       const manifestCandidates = [
-        ...(manifestAttr ? [new URL(manifestAttr, window.location.origin).href] : []),
+        ...(manifestAttr ? [new URL(manifestAttr, baseUrl).href] : []),
         new URL("python/manifest.json", staticBase).href,
         new URL("static/python/manifest.json", baseUrl).href,
         new URL("/static/python/manifest.json", window.location.origin).href,
