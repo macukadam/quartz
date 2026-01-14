@@ -11,7 +11,7 @@ async function initPyodide() {
   return pyodide
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+const attachPyodideButtons = () => {
   const pythonBlocks = document.querySelectorAll(
     'pre[data-language="python"], pre code[data-language="python"], pre code.language-python',
   )
@@ -70,4 +70,12 @@ document.addEventListener("DOMContentLoaded", () => {
     block.appendChild(btn)
     block.after(output)
   })
-})
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", attachPyodideButtons)
+} else {
+  attachPyodideButtons()
+}
+
+document.addEventListener("nav", attachPyodideButtons)
