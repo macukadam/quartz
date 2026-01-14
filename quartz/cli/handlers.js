@@ -548,12 +548,46 @@ export async function handleRestore(argv) {
 }
 
 /**
+ * Generates manifest.json listing all Python files in quartz/static/python/
+ */
+async function generatePythonManifest() {
+  const pythonDir = path.join(cwd, "quartz/static/python")
+  const manifestPath = path.join(pythonDir, "manifest.json")
+
+  if (!fs.existsSync(pythonDir)) {
+    return
+  }
+
+  const findPythonFiles = (dir, baseDir = dir) => {
+    const files = []
+    for (const entry of fs.readdirSync(dir)) {
+      const fullPath = path.join(dir, entry)
+      const stat = fs.statSync(fullPath)
+      if (stat.isDirectory()) {
+        files.push(...findPythonFiles(fullPath, baseDir))
+      } else if (entry.endsWith(".py")) {
+        files.push(path.relative(baseDir, fullPath))
+      }
+    }
+    return files
+  }
+
+  const pythonFiles = findPythonFiles(pythonDir)
+  await fs.promises.writeFile(manifestPath, JSON.stringify(pythonFiles, null, 2))
+  console.log(styleText("green", `Generated Python manifest with ${pythonFiles.length} files`))
+}
+
+/**
  * Handles `npx quartz sync`
  * @param {*} argv arguments for `sync`
  */
 export async function handleSync(argv) {
   const contentFolder = resolveContentPath(argv.directory)
   console.log(`\n${styleText(["bgGreen", "black"], ` Quartz v${version} `)}\n`)
+
+  // Generate Python manifest before syncing
+  await generatePythonManifest()
+
   console.log("Backing up your content")
 
   if (argv.commit) {

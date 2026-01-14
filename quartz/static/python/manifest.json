@@ -1,0 +1,6 @@
+[
+  "algos/__init__.py",
+  "algos/binarysearchtree.py",
+  "algos/binarytree.py",
+  "algos/linkedlist.py"
+]

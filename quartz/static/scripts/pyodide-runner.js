@@ -1,4 +1,5 @@
 let pyodide = null
+let modulesLoaded = false
 
 async function initPyodide() {
   while (typeof loadPyodide === "undefined") {
@@ -8,6 +9,73 @@ async function initPyodide() {
   if (!pyodide) {
     pyodide = await loadPyodide()
   }
+
+  // Load shared modules if not already loaded
+  if (!modulesLoaded) {
+    const baseUrl =
+      window.location.origin +
+      (window.spaNavigate
+        ? document.querySelector("base")?.href?.replace(window.location.origin, "") || "/"
+        : "/")
+
+    try {
+      // Fetch the auto-generated manifest
+      const manifestUrl = new URL("static/python/manifest.json", baseUrl).href
+      const manifestResponse = await fetch(manifestUrl)
+      if (!manifestResponse.ok) {
+        console.warn("Python manifest not found. Run the build to generate it.")
+        modulesLoaded = true
+        return pyodide
+      }
+
+      const modules = await manifestResponse.json()
+
+      // Add root to Python path so imports work
+      pyodide.runPython(`
+        import sys
+        if '/' not in sys.path:
+            sys.path.insert(0, '/')
+      `)
+
+      // Track created directories to avoid duplicates
+      const createdDirs = new Set()
+
+      for (const modulePath of modules) {
+        try {
+          // Create parent directories if needed
+          const parts = modulePath.split("/")
+          if (parts.length > 1) {
+            let dirPath = ""
+            for (let i = 0; i < parts.length - 1; i++) {
+              dirPath += "/" + parts[i]
+              if (!createdDirs.has(dirPath)) {
+                try {
+                  pyodide.FS.mkdir(dirPath)
+                } catch (e) {
+                  // Directory might already exist
+                }
+                createdDirs.add(dirPath)
+              }
+            }
+          }
+
+          const moduleUrl = new URL(`static/python/${modulePath}`, baseUrl).href
+          const response = await fetch(moduleUrl)
+          if (response.ok) {
+            const moduleCode = await response.text()
+            pyodide.FS.writeFile(`/${modulePath}`, moduleCode)
+          }
+        } catch (e) {
+          console.warn(`Could not load Python module ${modulePath}:`, e)
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load Python modules:", e)
+    }
+
+    modulesLoaded = true
+  }
+
   return pyodide
 }
 
