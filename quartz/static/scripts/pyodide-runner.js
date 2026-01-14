@@ -12,11 +12,8 @@ async function initPyodide() {
 
   // Load shared modules if not already loaded
   if (!modulesLoaded) {
-    const baseUrl =
-      window.location.origin +
-      (window.spaNavigate
-        ? document.querySelector("base")?.href?.replace(window.location.origin, "") || "/"
-        : "/")
+    const baseHref = document.querySelector("base")?.href || "/"
+    const baseUrl = new URL(baseHref, window.location.origin)
 
     try {
       // Fetch the auto-generated manifest
